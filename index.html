@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR招聘台账 · 每日漏斗</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1720px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 10, 30, 0.08);
+            padding: 1.8rem 1.8rem 2rem;
+        }
+
+        /* 头部 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0b1b32;
+        }
+
+        .badge {
+            background: #e9eff8;
+            color: #1f4e8c;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #cbd9ec;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            background: #ffffff;
+            padding: 9px 18px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #d0dcec;
+            color: #1e3b5c;
+            box-shadow: 0 2px 4px rgba(0, 20, 40, 0.02);
+        }
+
+        .btn-primary {
+            background: #1a5cff;
+            border: 1px solid #1a5cff;
+            color: white;
+            box-shadow: 0 8px 16px -6px rgba(26, 92, 255, 0.3);
+        }
+
+        .btn-primary i {
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0a4ad0;
+            border-color: #0a4ad0;
+        }
+
+        .btn:hover {
+            background: #f8faff;
+            border-color: #b2c7e0;
+        }
+
+        /* 表格容器 */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #e2eaf5;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1750px;
+            white-space: nowrap;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.9rem 1rem;
+            background: #f9fcff;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #29527a;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-bottom: 1px solid #d9e5f2;
+            border-right: 1px solid #e7eef9;
+        }
+
+        td {
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid #edf3fb;
+            border-right: 1px solid #f0f5fd;
+            color: #1c2f4a;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            background: white;
+        }
+
+        th:last-child,
+        td:last-child {
+            border-right: none;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #fafdff;
+        }
+
+        /* 序号 */
+        .serial-number {
+            font-weight: 600;
+            color: #1a5cff;
+            background: #f0f6ff;
+            border-radius: 20px;
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            text-align: center;
+            min-width: 40px;
+        }
+
+        /* 文件导入 */
+        .file-import {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-import input[type="file"] {
+            display: none;
+        }
+
+        .file-import label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eef4ff;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            color: #1a5cff;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.15s;
+        }
+
+        .file-import label:hover {
+            background: #dce9ff;
+            border-color: #b8d0ff;
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            color: #2d4f77;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            background: #f5f9ff;
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid #dbe7f5;
+        }
+
+        /* 岗位输入框 */
+        .position-input {
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid #d0dcec;
+            font-size: 0.85rem;
+            color: #1c2f4a;
+            background: white;
+            width: 120px;
+            outline: none;
+            transition: 0.1s;
+        }
+
+        .position-input:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        .position-input::placeholder {
+            color: #b0c3da;
+            font-size: 0.8rem;
+        }
+
+        /* 候选人BG 输入框 */
+        .bg-input {
+            padding: 6px 12px;
+            border-radius: 30px;
+            border: 1px solid #d0dcec;
+            font-size: 0.85rem;
+            color: #1c2f4a;
+            background: white;
+            width: 160px;
+            outline: none;
+            transition: 0.1s;
+        }
+
+        .bg-input:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        .bg-input::placeholder {
+            color: #b0c3da;
+            font-size: 0.8rem;
+        }
+
+        /* 下拉选择器 —— 通过绿色，不通过红色，其余蓝色 */
+        .status-select {
+            padding: 6px 10px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid #d0dcec;
+            background: white;
+            color: #1e3b5c;
+            cursor: pointer;
+            outline: none;
+            transition: 0.1s;
+            min-width: 110px;
+        }
+
+        .status-select:hover {
+            border-color: #a0b8d0;
+        }
+
+        /* 通过 = 绿色 */
+        .status-select.pass {
+            background: #e4f7ec;
+            color: #0a7343;
+            border-color: #b6e6cf;
+        }
+
+        /* 不通过 = 红色 */
+        .status-select.fail {
+            background: #feeceb;
+            color: #b33b36;
+            border-color: #f9cfcc;
+        }
+
+        /* 其余选项（未沟通/未开始）= 蓝色 */
+        .status-select.pending {
+            background: #e8f0fe;
+            color: #1a5cff;
+            border-color: #b8d0ff;
+        }
+
+        /* 选项颜色 */
+        .status-select option[value="pass"] {
+            background: #e4f7ec;
+            color: #0a7343;
+            font-weight: 600;
+        }
+
+        .status-select option[value="fail"] {
+            background: #feeceb;
+            color: #b33b36;
+            font-weight: 600;
+        }
+
+        .status-select option[value="pending"] {
+            background: #e8f0fe;
+            color: #1a5cff;
+            font-weight: 600;
+        }
+
+        /* 时间输入 */
+        .datetime-input {
+            padding: 5px 8px;
+            border-radius: 20px;
+            border: 1px solid #d0dcec;
+            font-size: 0.75rem;
+            color: #1c2f4a;
+            background: white;
+            width: 160px;
+            outline: none;
+        }
+
+        .datetime-input:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        /* 日期输入 */
+        .date-input {
+            padding: 5px 8px;
+            border-radius: 20px;
+            border: 1px solid #d0dcec;
+            font-size: 0.75rem;
+            color: #1c2f4a;
+            background: white;
+            width: 135px;
+            outline: none;
+        }
+
+        .date-input:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        /* 操作图标 */
+        .action-icon {
+            color: #9bb1cc;
+            margin: 0 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .action-icon:hover {
+            color: #1a5cff;
+        }
+
+        .action-icon.delete:hover {
+            color: #d9534f;
+        }
+
+        /* 每日漏斗区域 */
+        .daily-section {
+            margin-top: 1.8rem;
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 1.5rem 1.8rem;
+            border: 1px solid #e0ebf9;
+        }
+
+        .daily-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .daily-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0b1b32;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 筛选控件组 */
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #2d4f77;
+            background: white;
+            padding: 4px 12px 4px 16px;
+            border-radius: 40px;
+            border: 1px solid #d0dcec;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-group i {
+            color: #1a5cff;
+            font-size: 0.9rem;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+            font-size: 0.85rem;
+            color: #2d4f77;
+        }
+
+        .filter-group input[type="date"],
+        .filter-group select {
+            padding: 6px 8px;
+            border-radius: 20px;
+            border: 1px solid #d0dcec;
+            background: white;
+            font-size: 0.85rem;
+            color: #1e3b5c;
+            outline: none;
+            cursor: pointer;
+            min-width: 130px;
+        }
+
+        .filter-group input[type="date"]:focus,
+        .filter-group select:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        .filter-group select {
+            min-width: 140px;
+        }
+
+        .clear-filter {
+            background: none;
+            border: none;
+            color: #7e96b0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            transition: 0.15s;
+        }
+
+        .clear-filter:hover {
+            background: #f0f4fa;
+            color: #1a5cff;
+        }
+
+        .daily-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #e2edfb;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #5e7a9c;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #0b1b32;
+            line-height: 1.2;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: #7e96b0;
+            margin-top: 4px;
+        }
+
+        .daily-funnel-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 0.8rem;
+        }
+
+        .funnel-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .funnel-label {
+            width: 120px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #1e3b5c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .funnel-bar-bg {
+            flex: 1;
+            height: 28px;
+            background: #e9eff8;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .funnel-bar-fill {
+            height: 100%;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            padding-left: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+            transition: width 0.3s;
+        }
+
+        .bar-resume {
+            background: #1a5cff;
+        }
+
+        .bar-phone {
+            background: #3b7cff;
+        }
+
+        .bar-first {
+            background: #5e9cff;
+        }
+
+        .bar-second {
+            background: #8bb8ff;
+        }
+
+        .funnel-count {
+            min-width: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #0b1b32;
+        }
+
+        /* 按岗位明细 */
+        .position-breakdown {
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 16px;
+            padding: 1rem 1.2rem;
+            border: 1px solid #e2edfb;
+        }
+
+        .position-breakdown h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e3b5c;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+        }
+
+        .position-card {
+            background: #fafdff;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e7f0fa;
+            transition: 0.15s;
+        }
+
+        .position-card:hover {
+            border-color: #c5ddf5;
+            box-shadow: 0 2px 8px rgba(26, 92, 255, 0.04);
+        }
+
+        .position-card .pos-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a5cff;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .position-card .pos-name .pos-badge {
+            font-weight: 500;
+            font-size: 0.7rem;
+            background: #e9eff8;
+            padding: 2px 10px;
+            border-radius: 20px;
+            color: #29527a;
+        }
+
+        .position-card .pos-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: #3d5f82;
+            flex-wrap: wrap;
+        }
+
+        .position-card .pos-stats span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .position-card .pos-stats strong {
+            color: #0b1b32;
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: #7e96b0;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 无数据提示 */
+        .empty-hint {
+            text-align: center;
+            color: #7e96b0;
+            padding: 1.5rem;
+            font-size: 0.9rem;
+            grid-column: 1 / -1;
+        }
+
+        /* 入职时间输入特殊样式 */
+        .onboard-input {
+            padding: 5px 8px;
+            border-radius: 20px;
+            border: 1px solid #d0dcec;
+            font-size: 0.75rem;
+            color: #1c2f4a;
+            background: white;
+            width: 150px;
+            outline: none;
+        }
+
+        .onboard-input:focus {
+            border-color: #1a5cff;
+            box-shadow: 0 0 0 2px rgba(26, 92, 255, 0.1);
+        }
+
+        .onboard-input.filled {
+            background: #e4f7ec;
+            border-color: #b6e6cf;
+            color: #0a7343;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-address-book" style="color: #1a5cff; margin-right: 10px;"></i>招聘台账 · 每日漏斗</h1>
+                <span class="badge"><i class="fas fa-users"></i> HR 专属</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn" id="exportBtn"><i class="fas fa-download"></i> 导出CSV</button>
+                <button class="btn btn-primary" id="addBtn"><i class="fas fa-plus-circle"></i> 新增候选人</button>
+            </div>
+        </div>
+
+        <!-- 主表格 -->
+        <div class="table-wrapper">
+            <table id="recruitmentTable">
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>候选人简历</th>
+                        <th>应聘岗位</th>
+                        <th>简历日期</th>
+                        <th>电话沟通</th>
+                        <th>一面</th>
+                        <th>一面时间</th>
+                        <th>二面</th>
+                        <th>二面时间</th>
+                        <th>最后入职时间</th>
+                        <th>候选人BG</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- 动态渲染，初始为空 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 每日招聘漏斗 -->
+        <div class="daily-section">
+            <div class="daily-header">
+                <h2><i class="fas fa-chart-line" style="color: #1a5cff;"></i> 每日招聘进度 · 漏斗汇总</h2>
+                <div class="filter-controls">
+                    <div class="filter-group">
+                        <i class="fas fa-calendar-day"></i>
+                        <label for="datePicker">日期</label>
+                        <input type="date" id="datePicker">
+                    </div>
+                    <div class="filter-group">
+                        <i class="fas fa-briefcase"></i>
+                        <label for="positionFilter">岗位</label>
+                        <select id="positionFilter">
+                            <option value="all">全部岗位</option>
+                            <!-- 动态填充 -->
+                        </select>
+                    </div>
+                    <button class="clear-filter" id="clearFilterBtn"><i class="fas fa-times-circle"></i> 清除筛选</button>
+                </div>
+            </div>
+
+            <div class="daily-stats-grid" id="dailyStatsGrid">
+                <!-- 动态统计卡片，初始为空 -->
+            </div>
+
+            <div class="daily-funnel-bars" id="dailyFunnelBars">
+                <!-- 动态漏斗条，初始为空 -->
+            </div>
+
+            <!-- 按岗位明细 -->
+            <div class="position-breakdown" id="positionBreakdown">
+                <h3><i class="fas fa-briefcase" style="color: #1a5cff;"></i> 按岗位明细</h3>
+                <div class="position-grid" id="positionGrid">
+                    <!-- 动态岗位卡片，初始为空 -->
+                </div>
+            </div>
+
+            <div class="note">
+                <i class="fas fa-info-circle"></i> 基于所选日期和岗位筛选简历投递数据计算，转化率 = 当前环节通过人数 / 筛选后简历总数
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- 辅助函数 ----------
+            function formatDate(date) {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}-${m}-${d}`;
+            }
+
+            function getTodayStr() {
+                return formatDate(new Date());
+            }
+
+            // ---------- 数据模型：完全为空 ----------
+            let candidates = [];
+
+            const statusOptions = [
+                { value: 'pass', label: '通过', className: 'pass' },
+                { value: 'fail', label: '不通过', className: 'fail' },
+                { value: 'pending', label: '未沟通/未开始', className: 'pending' }
+            ];
+
+            // 获取DOM
+            const tableBody = document.getElementById('tableBody');
+            const datePicker = document.getElementById('datePicker');
+            const positionFilter = document.getElementById('positionFilter');
+            const dailyStatsGrid = document.getElementById('dailyStatsGrid');
+            const dailyFunnelBars = document.getElementById('dailyFunnelBars');
+            const positionGrid = document.getElementById('positionGrid');
+            const clearFilterBtn = document.getElementById('clearFilterBtn');
+
+            // ---------- 渲染表格 ----------
+            function renderTable() {
+                tableBody.innerHTML = '';
+                if (candidates.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="12" style="text-align: center; padding: 2rem; color: #7e96b0; background: #f9fcff;">
+                        <i class="fas fa-user-plus" style="margin-right: 8px;"></i> 暂无候选人，点击“新增候选人”开始录入
+                    </td>`;
+                    tableBody.appendChild(row);
+                    updateDailyFunnel();
+                    return;
+                }
+
+                candidates.forEach((c, index) => {
+                    const row = document.createElement('tr');
+                    row.dataset.id = c.id;
+                    const serial = (index + 1).toString().padStart(2, '0');
+
+                    const phoneSelect = createSelect(c.phoneStatus || 'pending', 'phone', c.id);
+                    const firstSelect = createSelect(c.firstStatus || 'pending', 'first', c.id);
+                    const secondSelect = createSelect(c.secondStatus || 'pending', 'second', c.id);
+
+                    const firstTimeInput = `<input type="datetime-local" class="datetime-input" data-type="firstTime" data-id="${c.id}" value="${c.firstTime || ''}">`;
+                    const secondTimeInput = `<input type="datetime-local" class="datetime-input" data-type="secondTime" data-id="${c.id}" value="${c.secondTime || ''}">`;
+                    const resumeDateInput = `<input type="date" class="date-input" data-type="resumeDate" data-id="${c.id}" value="${c.resumeDate || ''}">`;
+                    const positionInput = `<input type="text" class="position-input" data-type="position" data-id="${c.id}" value="${c.position || ''}" placeholder="输入岗位">`;
+                    const onboardInput = `<input type="date" class="onboard-input ${c.onboardDate ? 'filled' : ''}" data-type="onboardDate" data-id="${c.id}" value="${c.onboardDate || ''}" placeholder="选择日期">`;
+                    const bgInput = `<input type="text" class="bg-input" data-type="bg" data-id="${c.id}" value="${c.bg || ''}" placeholder="输入BG（院校/专业等）">`;
+
+                    row.innerHTML = `
+                        <td><span class="serial-number">${serial}</span></td>
+                        <td>
+                            <div class="file-import">
+                                <input type="file" id="file-${c.id}" accept=".pdf,.doc,.docx" onchange="handleFileUpload(${c.id}, this)">
+                                <label for="file-${c.id}"><i class="fas fa-upload"></i> 导入</label>
+                                <span class="file-name" id="fileName-${c.id}">${c.resumeFileName || '未上传'}</span>
+                            </div>
+                        </td>
+                        <td>${positionInput}</td>
+                        <td>${resumeDateInput}</td>
+                        <td>${phoneSelect}</td>
+                        <td>${firstSelect}</td>
+                        <td>${firstTimeInput}</td>
+                        <td>${secondSelect}</td>
+                        <td>${secondTimeInput}</td>
+                        <td>${onboardInput}</td>
+                        <td>${bgInput}</td>
+                        <td>
+                            <i class="fas fa-trash-alt action-icon delete" onclick="deleteCandidate(${c.id})" title="删除"></i>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+
+                bindSelectEvents();
+                bindTimeEvents();
+                bindPositionEvents();
+                bindDateEvents();
+                bindOnboardEvents();
+                bindBgEvents();
+                updatePositionFilter();
+                updateDailyFunnel();
+            }
+
+            function createSelect(currentStatus, type, id) {
+                const select = document.createElement('select');
+                select.className = `status-select ${currentStatus}`;
+                select.dataset.type = type;
+                select.dataset.id = id;
+                statusOptions.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    if (opt.value === currentStatus) option.selected = true;
+                    select.appendChild(option);
+                });
+                return select.outerHTML;
+            }
+
+            function bindSelectEvents() {
+                document.querySelectorAll('.status-select').forEach(select => {
+                    select.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const type = this.dataset.type;
+                        const newVal = this.value;
+                        const candidate = candidates.find(c => c.id === id);
+                        if (!candidate) return;
+                        if (type === 'phone') candidate.phoneStatus = newVal;
+                        else if (type === 'first') candidate.firstStatus = newVal;
+                        else if (type === 'second') candidate.secondStatus = newVal;
+                        this.className = `status-select ${newVal}`;
+                        updateDailyFunnel();
+                    });
+                });
+            }
+
+            function bindTimeEvents() {
+                document.querySelectorAll('.datetime-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const type = this.dataset.type;
+                        const candidate = candidates.find(c => c.id === id);
+                        if (!candidate) return;
+                        if (type === 'firstTime') candidate.firstTime = this.value;
+                        else if (type === 'secondTime') candidate.secondTime = this.value;
+                    });
+                });
+            }
+
+            function bindPositionEvents() {
+                document.querySelectorAll('.position-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const candidate = candidates.find(c => c.id === id);
+                        if (candidate) {
+                            candidate.position = this.value.trim() || '未填写';
+                        }
+                        updatePositionFilter();
+                        updateDailyFunnel();
+                    });
+                });
+            }
+
+            function bindDateEvents() {
+                document.querySelectorAll('.date-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const candidate = candidates.find(c => c.id === id);
+                        if (candidate) {
+                            candidate.resumeDate = this.value;
+                        }
+                        updateDailyFunnel();
+                    });
+                });
+            }
+
+            function bindOnboardEvents() {
+                document.querySelectorAll('.onboard-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const candidate = candidates.find(c => c.id === id);
+                        if (candidate) {
+                            candidate.onboardDate = this.value;
+                            if (this.value) this.classList.add('filled');
+                            else this.classList.remove('filled');
+                        }
+                    });
+                });
+            }
+
+            function bindBgEvents() {
+                document.querySelectorAll('.bg-input').forEach(input => {
+                    input.addEventListener('change', function() {
+                        const id = parseInt(this.dataset.id);
+                        const candidate = candidates.find(c => c.id === id);
+                        if (candidate) {
+                            candidate.bg = this.value.trim();
+                        }
+                    });
+                });
+            }
+
+            window.handleFileUpload = function(id, input) {
+                const file = input.files[0];
+                if (!file) return;
+                const candidate = candidates.find(c => c.id === id);
+                if (candidate) {
+                    candidate.resumeFileName = file.name;
+                    document.getElementById(`fileName-${id}`).textContent = file.name;
+                }
+            };
+
+            window.deleteCandidate = function(id) {
+                if (!confirm('确定删除该候选人吗？')) return;
+                candidates = candidates.filter(c => c.id !== id);
+                renderTable();
+            };
+
+            document.getElementById('addBtn').addEventListener('click', function() {
+                const newId = candidates.length > 0 ? Math.max(...candidates.map(c => c.id)) + 1 : 1;
+                const newCandidate = {
+                    id: newId,
+                    name: '',
+                    position: '',
+                    phoneStatus: 'pending',
+                    firstStatus: 'pending',
+                    firstTime: '',
+                    secondStatus: 'pending',
+                    secondTime: '',
+                    bg: '',
+                    resumeFileName: '',
+                    resumeDate: getTodayStr(),
+                    onboardDate: ''
+                };
+                candidates.push(newCandidate);
+                renderTable();
+            });
+
+            // ---------- 更新岗位筛选下拉框 ----------
+            function updatePositionFilter() {
+                const currentVal = positionFilter.value;
+                const positions = [...new Set(candidates.map(c => c.position).filter(p => p && p !== '未填写'))];
+                positionFilter.innerHTML = '<option value="all">全部岗位</option>';
+                positions.forEach(pos => {
+                    const option = document.createElement('option');
+                    option.value = pos;
+                    option.textContent = pos;
+                    positionFilter.appendChild(option);
+                });
+                if (currentVal !== 'all' && positions.includes(currentVal)) {
+                    positionFilter.value = currentVal;
+                } else {
+                    positionFilter.value = 'all';
+                }
+            }
+
+            // ---------- 每日漏斗（支持日期+岗位筛选） ----------
+            function updateDailyFunnel() {
+                const selectedDate = datePicker.value;
+                const selectedPosition = positionFilter.value;
+
+                if (!selectedDate) return;
+
+                // 先按日期筛选
+                let filtered = candidates.filter(c => c.resumeDate === selectedDate);
+
+                // 再按岗位筛选
+                if (selectedPosition !== 'all') {
+                    filtered = filtered.filter(c => c.position === selectedPosition);
+                }
+
+                const total = filtered.length;
+                const phonePass = filtered.filter(c => c.phoneStatus === 'pass').length;
+                const firstPass = filtered.filter(c => c.firstStatus === 'pass').length;
+                const secondPass = filtered.filter(c => c.secondStatus === 'pass').length;
+
+                // 按岗位分组（用于明细卡片）
+                const positionMap = new Map();
+                filtered.forEach(c => {
+                    const pos = c.position || '未填写';
+                    if (!positionMap.has(pos)) positionMap.set(pos, []);
+                    positionMap.get(pos).push(c);
+                });
+
+                // 渲染统计卡片
+                if (total === 0) {
+                    dailyStatsGrid.innerHTML = `<div class="stat-card empty-hint" style="grid-column:1/-1;"><i class="fas fa-inbox"></i> 所选条件暂无简历投递</div>`;
+                    dailyFunnelBars.innerHTML = '';
+                    positionGrid.innerHTML = `<div class="empty-hint">暂无岗位数据</div>`;
+                    return;
+                }
+
+                dailyStatsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fas fa-file-alt" style="color:#1a5cff;"></i> 简历总数</div>
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-sub">${selectedDate}${selectedPosition !== 'all' ? ' · ' + selectedPosition : ''}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fas fa-phone" style="color:#3b7cff;"></i> 电话通过</div>
+                        <div class="stat-value" style="color:#0a7343;">${phonePass}</div>
+                        <div class="stat-sub">通过率 ${Math.round(phonePass / total * 100)}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fas fa-user-tie" style="color:#5e9cff;"></i> 一面通过</div>
+                        <div class="stat-value" style="color:#0a7343;">${firstPass}</div>
+                        <div class="stat-sub">通过率 ${Math.round(firstPass / total * 100)}%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label"><i class="fas fa-users" style="color:#8bb8ff;"></i> 二面通过</div>
+                        <div class="stat-value" style="color:#0a7343;">${secondPass}</div>
+                        <div class="stat-sub">通过率 ${Math.round(secondPass / total * 100)}%</div>
+                    </div>
+                `;
+
+                const maxVal = Math.max(total, 1);
+                dailyFunnelBars.innerHTML = `
+                    <div class="funnel-row">
+                        <div class="funnel-label"><i class="fas fa-file-alt" style="color:#1a5cff;"></i> 简历投递</div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill bar-resume" style="width: ${total / maxVal * 100}%">${total}</div>
+                        </div>
+                        <div class="funnel-count">${total}</div>
+                    </div>
+                    <div class="funnel-row">
+                        <div class="funnel-label"><i class="fas fa-phone" style="color:#3b7cff;"></i> 电话通过</div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill bar-phone" style="width: ${phonePass / maxVal * 100}%">${phonePass}</div>
+                        </div>
+                        <div class="funnel-count">${phonePass}</div>
+                    </div>
+                    <div class="funnel-row">
+                        <div class="funnel-label"><i class="fas fa-user-tie" style="color:#5e9cff;"></i> 一面通过</div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill bar-first" style="width: ${firstPass / maxVal * 100}%">${firstPass}</div>
+                        </div>
+                        <div class="funnel-count">${firstPass}</div>
+                    </div>
+                    <div class="funnel-row">
+                        <div class="funnel-label"><i class="fas fa-users" style="color:#8bb8ff;"></i> 二面通过</div>
+                        <div class="funnel-bar-bg">
+                            <div class="funnel-bar-fill bar-second" style="width: ${secondPass / maxVal * 100}%">${secondPass}</div>
+                        </div>
+                        <div class="funnel-count">${secondPass}</div>
+                    </div>
+                `;
+
+                // 按岗位明细
+                positionGrid.innerHTML = '';
+                if (positionMap.size === 0) {
+                    positionGrid.innerHTML = `<div class="empty-hint">暂无岗位数据</div>`;
+                } else {
+                    positionMap.forEach((list, pos) => {
+                        const posTotal = list.length;
+                        const posPhone = list.filter(c => c.phoneStatus === 'pass').length;
+                        const posFirst = list.filter(c => c.firstStatus === 'pass').length;
+                        const posSecond = list.filter(c => c.secondStatus === 'pass').length;
+                        const card = document.createElement('div');
+                        card.className = 'position-card';
+                        card.innerHTML = `
+                            <div class="pos-name">
+                                <span><i class="fas fa-briefcase"></i> ${pos}</span>
+                                <span class="pos-badge">${posTotal} 份简历</span>
+                            </div>
+                            <div class="pos-stats">
+                                <span><i class="fas fa-file-alt" style="color:#1a5cff;"></i> 简历 <strong>${posTotal}</strong></span>
+                                <span><i class="fas fa-phone" style="color:#3b7cff;"></i> 电话 <strong style="color:#0a7343;">${posPhone}</strong></span>
+                                <span><i class="fas fa-user-tie" style="color:#5e9cff;"></i> 一面 <strong style="color:#0a7343;">${posFirst}</strong></span>
+                                <span><i class="fas fa-users" style="color:#8bb8ff;"></i> 二面 <strong style="color:#0a7343;">${posSecond}</strong></span>
+                            </div>
+                        `;
+                        positionGrid.appendChild(card);
+                    });
+                }
+            }
+
+            function initDatePicker() {
+                datePicker.value = getTodayStr();
+                datePicker.addEventListener('change', updateDailyFunnel);
+            }
+
+            positionFilter.addEventListener('change', updateDailyFunnel);
+
+            clearFilterBtn.addEventListener('click', function() {
+                datePicker.value = getTodayStr();
+                positionFilter.value = 'all';
+                updateDailyFunnel();
+            });
+
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                let csv = '序号,候选人简历,应聘岗位,简历日期,电话沟通,一面,一面时间,二面,二面时间,最后入职时间,候选人BG\n';
+                candidates.forEach((c, idx) => {
+                    const serial = (idx + 1).toString().padStart(2, '0');
+                    const phoneLabel = statusOptions.find(o => o.value === c.phoneStatus)?.label || c.phoneStatus;
+                    const firstLabel = statusOptions.find(o => o.value === c.firstStatus)?.label || c.firstStatus;
+                    const secondLabel = statusOptions.find(o => o.value === c.secondStatus)?.label || c.secondStatus;
+                    csv += `${serial},"${c.resumeFileName || ''}","${c.position || ''}","${c.resumeDate || ''}","${phoneLabel}","${firstLabel}","${c.firstTime || ''}","${secondLabel}","${c.secondTime || ''}","${c.onboardDate || ''}","${c.bg}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `招聘台账_${getTodayStr()}.csv`;
+                link.click();
+                URL.revokeObjectURL(link.href);
+            });
+
+            function init() {
+                initDatePicker();
+                renderTable();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
